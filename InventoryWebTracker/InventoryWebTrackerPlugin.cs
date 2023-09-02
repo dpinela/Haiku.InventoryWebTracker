@@ -1,6 +1,8 @@
 global using System;
 using Bep = BepInEx;
-
+using static EmbedIO.WebApi.WebApiModuleExtensions;
+using static EmbedIO.WebServerOptionsExtensions;
+using static EmbedIO.WebModuleContainerExtensions;
 namespace Haiku.InventoryWebTracker
 {
     [Bep.BepInPlugin("haiku.inventorywebtracker", "Haiku Inventory Web Tracker", "1.0.0.0")]
@@ -12,6 +14,26 @@ namespace Haiku.InventoryWebTracker
             modSettings = new(Config);
         }
 
+        public void Update()
+        {
+            if (modSettings!.Enabled.Value && uiServer == null)
+            {
+                uiServer = new EmbedIO.WebServer(opt => opt
+                    .WithUrlPrefix(url)
+                    .WithMode(EmbedIO.HttpListenerMode.EmbedIO)
+                ).WithWebApi("/", m => m.WithController<WebUI>());
+                uiServer.RunAsync();
+            }
+            else if (!modSettings!.Enabled.Value && uiServer != null)
+            {
+                uiServer.Dispose();
+                uiServer = null;
+            }
+        }
+
+        private const string url = "http://localhost:8086";
+
         private Settings? modSettings;
+        private EmbedIO.WebServer? uiServer;
     }
 }
