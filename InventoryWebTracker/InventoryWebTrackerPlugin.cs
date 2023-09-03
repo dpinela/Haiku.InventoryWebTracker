@@ -59,17 +59,15 @@ namespace Haiku.InventoryWebTracker
 
         private byte[] ToPNG(UE.Sprite sprite)
         {
-            var srcRect = sprite.textureRect;
             var act = UE.RenderTexture.active;
-            //var tmp = UE.RenderTexture.GetTemporary((int)srcRect.width, (int)srcRect.height);
             var tmp = UE.RenderTexture.GetTemporary(sprite.texture.width, sprite.texture.height, 0, UE.RenderTextureFormat.ARGB32);
             try
             {
                 UE.RenderTexture.active = tmp;
                 UE.Graphics.Blit(sprite.texture, tmp);
-                //UE.Graphics.CopyTexture(sprite.texture, 0, 0, 0, 0, tmp.width, tmp.height, tmp, 0, 0, 0, 0);
-                var buf = new UE.Texture2D(tmp.width, tmp.height, UE.TextureFormat.ARGB32, false);
-                buf.ReadPixels(new(0, 0, tmp.width, tmp.height), 0, 0, false);
+                var srcRect = sprite.textureRect;
+                var buf = new UE.Texture2D((int)srcRect.width, (int)srcRect.height, UE.TextureFormat.ARGB32, false);
+                buf.ReadPixels(srcRect, 0, 0, false);
                 var png = UE.ImageConversion.EncodeToPNG(buf);
                 UE.Object.Destroy(buf);
                 return png;
