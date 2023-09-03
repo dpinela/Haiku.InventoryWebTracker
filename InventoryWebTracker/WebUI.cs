@@ -46,7 +46,10 @@ namespace Haiku.InventoryWebTracker
             <img id='slot31' src='/icons/ability3.png'>
             <img id='slot32' src='/icons/ability4.png'>
             <img id='slot33' src='/icons/ability5.png'>
-            <img id='slot34' src='/icons/item0.png'>
+            <span id='slot34'>
+                <img src='/icons/item0.png'>
+                <span class='overlay-number' id='amount34'></span>
+            </span>
             <img id='slot35' src='/icons/item1.png'>
             <img id='slot39' src='/icons/item5.png'>
             <img id='slot41' src='/icons/item7.png'>
@@ -54,11 +57,66 @@ namespace Haiku.InventoryWebTracker
             <img id='slot43' src='/icons/bulblet.png'>
             <img id='slot44' src='/icons/fireres.png'>
             <img id='slot45' src='/icons/waterres.png'>
-            <img id='slot47' src='/icons/coolant.png'>
-            <img id='slot46' src='/icons/powercell.png'>
-            <img id='slot48' src='/icons/redchipslot.png'>
-            <img id='slot49' src='/icons/greenchipslot.png'>
-            <img id='slot50' src='/icons/bluechipslot.png'>
+            <span id='slot47'>
+                <img src='/icons/coolant.png'>
+                <span class='overlay-number' id='amount47'></span>
+            </span>
+            <span id='slot46'>
+                <img src='/icons/powercell.png'>
+                <span class='overlay-number' id='amount46'></span>
+            </span>
+            <span id='slot48'>
+                <img src='/icons/redchipslot.png'>
+                <span class='overlay-number' id='amount48'></span>
+            </span>
+            <span id='slot49'>
+                <img src='/icons/greenchipslot.png'>
+                <span class='overlay-number' id='amount49'></span>
+            </span>
+            <span id='slot50'>
+                <img src='/icons/bluechipslot.png'>
+                <span class='overlay-number' id='amount50'></span>
+            </span>
+            <style>
+                body {
+                    background-color: #FFF5D3;
+                    display: grid;
+                    grid-template-columns: repeat(auto-fill, 46px);
+                    grid-auto-rows: 46px;
+                }
+
+                body > img {
+                    border-radius: 8px;
+                    padding: 2px;
+                    width: 36px;
+                    height: 36px;
+                }
+
+                body > span {
+                    border-radius: 8px;
+                    padding: 2px;
+                    display: inline-flex;
+                    position: relative;
+                    width: 36px;
+                    height: 36px;
+                }
+
+                .overlay-number {
+                    visibility: hidden;
+                    position: absolute;
+                    width: 8px;
+                    height: 8px;
+                    bottom: 0;
+                    right: 0;
+                    display: inline-block;
+                    border-radius: 2px;
+                    background: black;
+                    text-align: center;
+                    font-size: 8px;
+                    font-family: sans-serif;
+                    color: white;
+                }
+            </style>
             <script>
                 window.addEventListener('load', () => {
                     let loc = window.location.href.replace(/^http:\/\//, 'ws://') + '/inventory'
@@ -67,11 +125,22 @@ namespace Haiku.InventoryWebTracker
                         let slots = JSON.parse(msg.data)
                         for (let i = 0; i < slots.length; i++) {
                             let icon = document.getElementById('slot' + i)
+                            let num = document.getElementById('amount' + i)
                             if (icon != null) {
                                 if (slots[i] > 0) {
-                                    icon.style.opacity = 1;
+                                    icon.style.opacity = 1
+                                    icon.style.border = '2px solid black'
                                 } else {
-                                    icon.style.opacity = 0.3;
+                                    icon.style.opacity = 0.3
+                                    icon.style.border = '2px solid rgba(0, 0, 0, 0)'
+                                }
+                            }
+                            if (num != null) {
+                                if (slots[i] > 0) {
+                                    num.style.visibility = 'visible'
+                                    num.innerText = String(slots[i])
+                                } else {
+                                    num.style.visibility = 'hidden'
                                 }
                             }
                         }
@@ -85,8 +154,6 @@ namespace Haiku.InventoryWebTracker
 
         private static Collections.Dictionary<string, Func<UE.Sprite>> BuildIconTable()
         {
-            try
-            {
             var tbl = new Collections.Dictionary<string, Func<UE.Sprite>>();
             for (var i = 0; i < 9; i++)
             {
@@ -132,12 +199,6 @@ namespace Haiku.InventoryWebTracker
             tbl["waterres.png"] = () => HaikuResources.ItemDesc().waterRes.image.sprite;
 
             return tbl;
-            }
-            catch (Exception err)
-            {
-                InventoryWebTrackerPlugin.Instance.LogError(err.ToString());
-                return new();
-            }
         }
     }
 }
