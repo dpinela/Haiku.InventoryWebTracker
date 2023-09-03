@@ -29,10 +29,10 @@ namespace Haiku.InventoryWebTracker
             await stream.WriteAsync(png, 0, png.Length);
         }
 
-        private const string UI = @"<!doctype html>
+        private const string UI = @"
+        <!doctype html>
         <html>
         <body>
-            <p>Hello!</p>
             <img src='/icons/chip1.png'>
             <img src='/icons/chip3.png'>
             <img src='/icons/chip6.png'>
@@ -46,6 +46,7 @@ namespace Haiku.InventoryWebTracker
             <img src='/icons/ability3.png'>
             <img src='/icons/ability4.png'>
             <img src='/icons/ability5.png'>
+            <img src='/icons/item0.png'>
             <img src='/icons/item1.png'>
             <img src='/icons/item5.png'>
             <img src='/icons/item7.png'>
@@ -53,6 +54,11 @@ namespace Haiku.InventoryWebTracker
             <img src='/icons/bulblet.png'>
             <img src='/icons/fireres.png'>
             <img src='/icons/waterres.png'>
+            <img src='/icons/coolant.png'>
+            <img src='/icons/powercell.png'>
+            <img src='/icons/redchipslot.png'>
+            <img src='/icons/greenchipslot.png'>
+            <img src='/icons/bluechipslot.png'>
         </body>
         </html>";
 
@@ -93,7 +99,6 @@ namespace Haiku.InventoryWebTracker
                         _ => throw new InvalidOperationException($"invalid chip slot color: {slot.chipSlotColor}")
                     };
                     tbl[key] = () => item.chipSlotImage;
-                    InventoryWebTrackerPlugin.Instance.LogError(key);
                     slotColors++;
                     if (slotColors == 3)
                     {

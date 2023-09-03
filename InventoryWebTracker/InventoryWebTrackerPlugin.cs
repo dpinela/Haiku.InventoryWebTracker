@@ -1,5 +1,6 @@
 global using System;
 using SyncCollections = System.Collections.Concurrent;
+using Collections = System.Collections.Generic;
 using Tasks = System.Threading.Tasks;
 using Bep = BepInEx;
 using UE = UnityEngine;
@@ -14,6 +15,13 @@ namespace Haiku.InventoryWebTracker
     {
         private static InventoryWebTrackerPlugin? plugin;
         internal static InventoryWebTrackerPlugin Instance => plugin!;
+
+        private Settings? modSettings;
+        private EmbedIO.WebServer? uiServer;
+
+        private Inventory? lastState;
+
+        private const string url = "http://localhost:8086";
 
         public void Start()
         {
@@ -31,7 +39,9 @@ namespace Haiku.InventoryWebTracker
                 uiServer = new EmbedIO.WebServer(opt => opt
                     .WithUrlPrefix(url)
                     .WithMode(EmbedIO.HttpListenerMode.EmbedIO)
-                ).WithWebApi("/", m => m.WithController<WebUI>());
+                )
+                    .WithModule(new UpdateSocket("/inventory"))
+                    .WithWebApi("/", m => m.WithController<WebUI>());
                 uiServer.RunAsync();
             }
             else if (!modSettings!.Enabled.Value && uiServer != null)
@@ -40,18 +50,47 @@ namespace Haiku.InventoryWebTracker
                 uiServer = null;
             }
 
-            if (iconFetchQueue.TryDequeue(out var task))
+            while (iconFetchQueue.TryDequeue(out var task))
             {
                 task.RunSynchronously();
             }
+
+            try
+            {
+                var inv = Inventory.Current();
+                if (!inv.Equals(lastState))
+                {
+                    foreach (var q in inventoryQueues)
+                    {
+                        q(inv);
+                    }
+                    lastState = inv;
+                }
+            }
+            catch (Exception)
+            {
+                // do nothing; we just couldn't read the inventory yet
+            }
         }
 
-        private const string url = "http://localhost:8086";
-
-        private Settings? modSettings;
-        private EmbedIO.WebServer? uiServer;
-
         private SyncCollections.ConcurrentQueue<Tasks.Task<byte[]>> iconFetchQueue = new();
+        private Collections.List<Action<Inventory>> inventoryQueues = new();
+
+        internal void Connect(Action<Inventory> client)
+        {
+            lock (inventoryQueues)
+            {
+                inventoryQueues.Add(client);
+            }
+        }
+
+        internal void Disconnect(Action<Inventory> client)
+        {
+            lock (inventoryQueues)
+            {
+                inventoryQueues.Remove(client);
+            }
+        }
 
         internal Tasks.Task<byte[]> ToPNGAsync(Func<UE.Sprite> getter)
         {
