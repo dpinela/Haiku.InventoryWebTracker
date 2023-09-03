@@ -17,9 +17,12 @@ namespace Haiku.InventoryWebTracker
 
         public void Start()
         {
+            HaikuResources.Init();
             plugin = this;
             modSettings = new(Config);
         }
+
+        public void LogError(String err) => Logger.LogError(err);
 
         public void Update()
         {
