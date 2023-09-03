@@ -20,8 +20,10 @@ namespace Haiku.InventoryWebTracker
         private EmbedIO.WebServer? uiServer;
 
         private Inventory? lastState;
+        private float timeSinceLastState = 0;
 
         private const string url = "http://localhost:8086";
+        private const float pollInterval = .1f;
 
         public void Start()
         {
@@ -55,6 +57,13 @@ namespace Haiku.InventoryWebTracker
                 task.RunSynchronously();
             }
 
+            timeSinceLastState += UE.Time.deltaTime;
+            if (timeSinceLastState < pollInterval)
+            {
+                return;
+            }
+            timeSinceLastState = 0;
+
             try
             {
                 var inv = Inventory.Current();
@@ -70,6 +79,16 @@ namespace Haiku.InventoryWebTracker
             catch (Exception)
             {
                 // do nothing; we just couldn't read the inventory yet
+            }
+        }
+
+        public void OnApplicationQuit()
+        {
+            // If we don't do this, the game will lock up when we try to quit it with a client connected.
+            if (uiServer != null)
+            {
+                uiServer.Dispose();
+                uiServer = null;
             }
         }
 
