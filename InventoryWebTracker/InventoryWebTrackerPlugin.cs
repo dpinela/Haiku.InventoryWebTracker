@@ -69,9 +69,12 @@ namespace Haiku.InventoryWebTracker
                 var inv = Inventory.Current();
                 if (!inv.Equals(lastState))
                 {
-                    foreach (var q in inventoryQueues)
+                    lock (inventoryQueues)
                     {
-                        q(inv);
+                        foreach (var q in inventoryQueues)
+                        {
+                            q(inv);
+                        }
                     }
                     lastState = inv;
                 }
@@ -100,6 +103,9 @@ namespace Haiku.InventoryWebTracker
             lock (inventoryQueues)
             {
                 inventoryQueues.Add(client);
+                if (lastState != null) {
+                    client(lastState);
+                }
             }
         }
 
