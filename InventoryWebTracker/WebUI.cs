@@ -33,32 +33,51 @@ namespace Haiku.InventoryWebTracker
         <!doctype html>
         <html>
         <body>
-            <img src='/icons/chip1.png'>
-            <img src='/icons/chip3.png'>
-            <img src='/icons/chip6.png'>
-            <img src='/icons/chip11.png'>
-            <img src='/icons/chip16.png'>
-            <img src='/icons/chip20.png'>
-            <img src='/icons/chip25.png'>
-            <img src='/icons/ability0.png'>
-            <img src='/icons/ability1.png'>
-            <img src='/icons/ability2.png'>
-            <img src='/icons/ability3.png'>
-            <img src='/icons/ability4.png'>
-            <img src='/icons/ability5.png'>
-            <img src='/icons/item0.png'>
-            <img src='/icons/item1.png'>
-            <img src='/icons/item5.png'>
-            <img src='/icons/item7.png'>
-            <img src='/icons/item8.png'>
-            <img src='/icons/bulblet.png'>
-            <img src='/icons/fireres.png'>
-            <img src='/icons/waterres.png'>
-            <img src='/icons/coolant.png'>
-            <img src='/icons/powercell.png'>
-            <img src='/icons/redchipslot.png'>
-            <img src='/icons/greenchipslot.png'>
-            <img src='/icons/bluechipslot.png'>
+            <img id='slot1' src='/icons/chip1.png'>
+            <img id='slot3' src='/icons/chip3.png'>
+            <img id='slot6' src='/icons/chip6.png'>
+            <img id='slot11' src='/icons/chip11.png'>
+            <img id='slot16' src='/icons/chip16.png'>
+            <img id='slot20' src='/icons/chip20.png'>
+            <img id='slot25' src='/icons/chip25.png'>
+            <img id='slot28' src='/icons/ability0.png'>
+            <img id='slot29' src='/icons/ability1.png'>
+            <img id='slot30' src='/icons/ability2.png'>
+            <img id='slot31' src='/icons/ability3.png'>
+            <img id='slot32' src='/icons/ability4.png'>
+            <img id='slot33' src='/icons/ability5.png'>
+            <img id='slot34' src='/icons/item0.png'>
+            <img id='slot35' src='/icons/item1.png'>
+            <img id='slot39' src='/icons/item5.png'>
+            <img id='slot41' src='/icons/item7.png'>
+            <img id='slot42' src='/icons/item8.png'>
+            <img id='slot43' src='/icons/bulblet.png'>
+            <img id='slot44' src='/icons/fireres.png'>
+            <img id='slot45' src='/icons/waterres.png'>
+            <img id='slot47' src='/icons/coolant.png'>
+            <img id='slot46' src='/icons/powercell.png'>
+            <img id='slot48' src='/icons/redchipslot.png'>
+            <img id='slot49' src='/icons/greenchipslot.png'>
+            <img id='slot50' src='/icons/bluechipslot.png'>
+            <script>
+                window.addEventListener('load', () => {
+                    let loc = window.location.href.replace(/^http:\/\//, 'ws://') + '/inventory'
+                    let conn = new WebSocket(loc)
+                    conn.addEventListener('message', msg => {
+                        let slots = JSON.parse(msg.data)
+                        for (let i = 0; i < slots.length; i++) {
+                            let icon = document.getElementById('slot' + i)
+                            if (icon != null) {
+                                if (slots[i] > 0) {
+                                    icon.style.opacity = 1;
+                                } else {
+                                    icon.style.opacity = 0.3;
+                                }
+                            }
+                        }
+                    })
+                })
+            </script>
         </body>
         </html>";
 
