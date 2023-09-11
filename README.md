@@ -4,6 +4,8 @@ This is a mod that provides a web interface to display the current
 inventory of the player in real-time, suitable for use as a browser source
 in [OBS][] or other similar software for streaming and recording.
 
+[OBS]: https://obsproject.com/
+
 ## Screenshot
 
 ![A screenshot with the game on the left and a two-column inventory display on the right](screenshot.png)
